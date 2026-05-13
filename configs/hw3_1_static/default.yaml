@@ -1,0 +1,54 @@
+# configs/hw3_1_static/default.yaml
+# HW3-1：Naive DQN，Static Mode
+# 對應 SPEC-03.1 Starter Code 基準值
+
+experiment_id: hw3_1_static_naive_dqn
+hw_part: hw3_1
+mode: static
+algorithm: NaiveDQN
+seed: 42
+
+network:
+  input_dim: 64       # 4x4x4 GridWorld flattened
+  hidden_1: 150       # starter code 預設值
+  hidden_2: 100
+  output_dim: 4       # 上下左右 4 個動作
+
+training:
+  episodes: 5000                  # 程式 3.8 預設值
+  max_steps_per_episode: 50       # max_moves = 50
+  gamma: 0.9                      # 折扣因子
+  learning_rate: 0.001            # 1e-3
+  batch_size: 200                 # mini-batch size
+  replay_capacity: 1000           # deque maxlen
+  target_update_frequency: 500    # sync_freq
+  use_gradient_clipping: false
+  max_grad_norm: 1.0
+  use_lr_scheduler: false
+  lr_scheduler_type: StepLR
+  lr_scheduler_step_size: 500
+  lr_scheduler_gamma: 0.9
+  use_lightning: false
+
+epsilon:
+  epsilon_start: 1.0
+  epsilon_end: 0.1
+  epsilon_decay_type: linear      # starter code 原版：1/epochs per episode
+  epsilon_decay_steps: 5000
+
+algorithm_flags:
+  use_target_network: true        # 使用 Target Network（S2）
+  use_double_dqn: false
+  use_dueling_dqn: false
+  use_per: false
+  per_alpha: 0.6
+  per_beta_start: 0.4
+  per_beta_end: 1.0
+  per_epsilon: 1.0e-5
+  use_n_step: false
+  n_step: 3
+  use_noisy_net: false
+  use_distributional: false
+  c51_atoms: 51
+  c51_v_min: -10.0
+  c51_v_max: 10.0

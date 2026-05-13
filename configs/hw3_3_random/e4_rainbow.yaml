@@ -1,0 +1,55 @@
+# configs/hw3_3_random/e4_rainbow.yaml
+# HW3-3 E4：Advanced Rainbow DQN Bonus Pipeline
+# ⚠️ BONUS ONLY — 不得修改 e1/e2/e3 config
+# ⚠️ E4 是獨立加分實驗，不取代 E1-E3
+
+experiment_id: hw3_3_E4_rainbow_bonus
+hw_part: hw3_3
+mode: random
+algorithm: RainbowDQN
+seed: 42
+
+network:
+  input_dim: 64
+  hidden_1: 150
+  hidden_2: 100
+  output_dim: 4
+
+training:
+  episodes: 5000
+  max_steps_per_episode: 50
+  gamma: 0.99                     # E4：較高 gamma，更重視長期回報
+  learning_rate: 0.0005           # E4：較低 LR，Rainbow 更穩定
+  batch_size: 200
+  replay_capacity: 5000           # E4：更大 buffer
+  target_update_frequency: 500
+  use_gradient_clipping: true
+  max_grad_norm: 10.0
+  use_lr_scheduler: true
+  lr_scheduler_type: CosineAnnealingLR
+  lr_scheduler_step_size: 500
+  lr_scheduler_gamma: 0.9
+  use_lightning: true
+
+epsilon:
+  epsilon_start: 1.0
+  epsilon_end: 0.01
+  epsilon_decay_type: exponential
+  epsilon_decay_steps: 2000
+
+algorithm_flags:
+  use_target_network: true
+  use_double_dqn: true            # Rainbow：Double DQN（S3）
+  use_dueling_dqn: true           # Rainbow：Dueling Network（S4）
+  use_per: true                   # Rainbow：PER（S5）
+  per_alpha: 0.6
+  per_beta_start: 0.4
+  per_beta_end: 1.0
+  per_epsilon: 1.0e-5
+  use_n_step: true                # Rainbow：Multi-step Learning
+  n_step: 3
+  use_noisy_net: false            # 可選
+  use_distributional: false       # 可選（C51）
+  c51_atoms: 51
+  c51_v_min: -10.0
+  c51_v_max: 10.0
