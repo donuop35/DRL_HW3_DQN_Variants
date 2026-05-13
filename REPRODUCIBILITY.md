@@ -1,172 +1,146 @@
-# REPRODUCIBILITY — DRL HW3: DQN and its Variants
+# REPRODUCIBILITY.md
+# HW3 DQN Variants — 完整重現指南
 
-> **文件版本**：v1.0
-> **建立日期**：2026-05-13
-> **作者**：Tony Lo
-
----
-
-## 可重現性承諾
-
-本專案嚴格遵循可重現性原則。**所有實驗結果必須來自真實執行，不得假造數據。**
+> 遵循 EXPERIMENT_PROTOCOL.md 的數據誠信規則：所有結果均可由本指南重現。
 
 ---
 
-## 1. 環境規格（Environment Specification）
+## 環境規格
 
-### 作業系統
-- macOS（Apple Silicon 或 Intel）
-
-### Python 版本
-- Python 3.10+（建議 3.10 或 3.11）
-
-### 主要依賴套件（待實驗確認後更新版本號）
-
-| 套件 | 版本 | 用途 |
-|------|------|------|
-| torch | ≥2.0.0 | 核心深度學習框架 |
-| pytorch-lightning | ≥2.0.0 | HW3-3 訓練框架 |
-| numpy | ≥1.24.0 | 數值計算 |
-| matplotlib | ≥3.7.0 | 視覺化 |
-| pandas | ≥2.0.0 | 數據分析 |
-| gymnasium | ≥0.29.0 | 環境介面（可選） |
-| pyyaml | ≥6.0 | 設定檔讀取 |
-| tqdm | ≥4.65.0 | 進度顯示 |
+| 項目 | 版本 |
+|------|------|
+| Python | 3.9 |
+| PyTorch | 2.0+ |
+| PyTorch Lightning | 2.6.0 |
+| NumPy | ≥1.24 |
+| Pandas | ≥1.5 |
+| Matplotlib | ≥3.7 |
+| PyYAML | ≥6.0 |
+| OS | macOS 14.x / Ubuntu 22.04（測試環境）|
 
 ---
 
-## 2. 隨機種子管理（Random Seed Management）
-
-所有實驗**必須**設定以下隨機種子：
-
-```python
-import random
-import numpy as np
-import torch
-
-def set_seed(seed: int = 42):
-    """固定所有隨機種子以確保可重現性"""
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
-```
-
-**預設種子**：`42`
-
----
-
-## 3. 超參數記錄（Hyperparameter Logging）
-
-每次實驗執行時，必須將完整超參數記錄至 `experiments/<hw>/<run_id>/config.yaml`：
-
-```yaml
-# 範例記錄格式
-experiment:
-  name: "hw3_1_naive_dqn"
-  seed: 42
-  timestamp: "2026-05-13T10:00:00"
-
-environment:
-  mode: "static"
-  grid_size: [4, 4]
-
-agent:
-  type: "NaiveDQN"
-  hidden_dim: 128
-  learning_rate: 0.001
-  gamma: 0.99
-  epsilon_start: 1.0
-  epsilon_end: 0.01
-  epsilon_decay: 0.995
-
-training:
-  num_episodes: 1000
-  batch_size: 64
-  memory_size: 10000
-  target_update_freq: 10
-```
-
----
-
-## 4. 實驗追蹤（Experiment Tracking）
-
-### 目錄結構
-
-每次實驗執行產生一個 run 目錄：
-
-```
-experiments/hw3_1_static/
-└── run_001/
-    ├── config.yaml          ← 超參數設定
-    ├── training_log.csv     ← 每 Episode 的 Reward, Loss, Epsilon
-    ├── final_model.pt       ← 最終模型權重
-    └── summary.md           ← 實驗摘要
-```
-
-### CSV 記錄格式
-
-```csv
-episode,reward,loss,epsilon,steps,timestamp
-1,-1.0,0.523,1.000,12,2026-05-13T10:00:01
-2,0.0,0.487,0.995,8,2026-05-13T10:00:02
-...
-```
-
----
-
-## 5. 如何重現實驗（How to Reproduce）
-
-### 完整重現步驟
+## 安裝
 
 ```bash
-# 1. 克隆 Repo
-git clone https://github.com/donuop35/DRL_DQN_Variants.git
-cd DRL_DQN_Variants
-
-# 2. 建立環境
-conda env create -f environment.yml
-conda activate drl-hw3
-# 或
+git clone https://github.com/donuop35/DRL_HW3_DQN_Variants.git
+cd DRL_HW3_DQN_Variants
 pip install -r requirements.txt
+```
 
-# 3. 執行特定實驗
-python scripts/run_hw3_1_static.py --seed 42 --config configs/hw3_1_static/default.yaml
-
-# 4. 重現所有實驗
-python scripts/run_all_experiments.py --seed 42
-
-# 5. 生成報告圖表
-python scripts/generate_report_assets.py
+驗證安裝：
+```bash
+python scripts/smoke_test.py
+# 預期輸出：11/11 PASSED
 ```
 
 ---
 
-## 6. 不可重現風險管理（Non-reproducibility Risk Management）
+## 固定隨機種子
 
-| 風險來源 | 緩解措施 |
-|---------|---------|
-| GPU 非確定性計算 | `torch.backends.cudnn.deterministic = True` |
-| 多執行緒非確定性 | 限制 DataLoader workers 為 0 |
-| 環境初始化 | 固定 seed 於 env.reset() |
-| Python/套件版本差異 | 記錄完整版本於 environment.yml |
-| 作業系統差異 | Docker image（可選，未實作） |
+所有實驗使用 `seed=42`，設定方式：
 
----
+```python
+from src.utils.seeding import set_global_seed
+set_global_seed(42)
+# 同時設定：random, numpy, torch, torch.cuda
+```
 
-## 7. 數據誠信聲明（Data Integrity Statement）
-
-> 本作業所有實驗結果均來自真實執行。
-> 不得假造、篡改、或複製他人的實驗數據。
-> 所有圖表必須由 `scripts/generate_report_assets.py` 從真實 CSV 數據生成。
+YAML config 中均有 `seed: 42`。
 
 ---
 
-## 8. 版本歷史
+## 實驗重現指令
 
-| 日期 | 版本 | 說明 |
-|------|------|------|
-| 2026-05-13 | v1.0 | Phase 1 初版建立 |
+### HW3-1 Static Mode
+
+```bash
+python scripts/run_hw3_1_static.py
+```
+
+**預期輸出檔案**：
+- `results/csv/hw3_1_static_basic_dqn_log.csv`（5000 rows）
+- `results/figures/hw3_1_static_basic_dqn_{reward,loss,win_rate,steps,epsilon}.png`
+- `results/checkpoints/hw3_1_static_basic_dqn/final_model.pt`
+
+**預期關鍵指標**：
+- Final Eval Win Rate：~100%
+- Last-500ep Win Rate：~98.6%
+- 訓練時間：~230 秒
+
+### HW3-2 Player Mode
+
+```bash
+python scripts/run_hw3_2_player.py
+```
+
+**預期輸出**：
+- `results/csv/hw3_2_player_{basic,double,dueling}_dqn_log.csv`（各 5000 rows）
+- `results/figures/hw3_2_player_*_comparison.png`（5 張比較圖）
+
+**預期關鍵指標**：
+- P1/P2/P3 Final Win Rate：均 ~100%
+- P2 Double DQN last-500 win rate：~100%
+
+### HW3-3 Random Mode E1/E2/E3
+
+```bash
+python scripts/run_hw3_3_random.py
+```
+
+**預期輸出**：
+- `results/csv/hw3_3_random_e{1,2,3}_*_log.csv`（各 5000 rows）
+- 7 張比較圖（`hw3_3_random_*_comparison_e1_e2_e3.png`）
+
+**預期關鍵指標**：
+- E1 Final Win Rate：~91.5%
+- E2 Final Win Rate：~88.5%
+- E3 Final Win Rate：~90.0%（全體 win rate 最高：~85.2%）
+
+### HW3-3 E4 Rainbow Bonus
+
+```bash
+python scripts/run_hw3_3_rainbow_bonus.py
+```
+
+**預期輸出**：
+- `results/csv/hw3_3_random_e4_rainbow_bonus_log.csv`（5000 rows）
+- 4 張 E4 個別圖 + 5 張 E1-E4 比較圖
+
+**預期關鍵指標**：
+- Final Win Rate：~40%（C51 在 5000ep 內收斂不足）
+- E1-E3 CSV 不被修改（integrity check 通過）
+
+---
+
+## 驗證所有結果
+
+```bash
+python - << 'EOF'
+import pandas as pd
+from pathlib import Path
+
+exps = [
+    "hw3_1_static_basic_dqn",
+    "hw3_2_player_basic_dqn", "hw3_2_player_double_dqn", "hw3_2_player_dueling_dqn",
+    "hw3_3_random_e1_baseline", "hw3_3_random_e2_stabilized",
+    "hw3_3_random_e3_per_stabilized", "hw3_3_random_e4_rainbow_bonus",
+]
+for exp in exps:
+    p = Path(f"results/csv/{exp}_log.csv")
+    df = pd.read_csv(p)
+    print(f"{'✅' if len(df)==5000 else '❌'} {exp}: rows={len(df)}, NaN={df.isna().sum().sum()}")
+EOF
+```
+
+---
+
+## 已知限制
+
+| 限制 | 說明 |
+|------|------|
+| E4 Rainbow 在小環境收斂慢 | C51 需要更大 buffer + 更多 episodes 才能超越 E1-E3 |
+| E2 LR 衰減過快 | StepLR per-step 使後期 lr~0.000004，是設計取捨而非錯誤 |
+| macOS 限定測試 | `torch.backends.mps` 未使用（訓練在 CPU 上）|
+| 訓練時間 | E4 Rainbow 約 2500 秒，其他各組 ~108-400 秒 |
+| GridWorld 相依 | 使用教授提供的 `Gridworld.py`（原始 starter code 保留不改）|

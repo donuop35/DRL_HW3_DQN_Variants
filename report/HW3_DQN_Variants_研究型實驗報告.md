@@ -4,7 +4,7 @@
 > **作業**：HW3 — DQN and its Variants  
 > **作者**：Tony Lo（中興大學）  
 > **日期**：2026-05-13  
-> **狀態**：HW3-1 ✅、HW3-2 ✅、HW3-3 🔄（進行中）
+> **狀態**：HW3-1 ✅、HW3-2 ✅、HW3-3 ✅、Bonus E4 ✅（Phase 9 Final Submission）
 
 ---
 
@@ -14,7 +14,7 @@
 
 1. **HW3-1（Static Mode）**：驗證 Basic DQN 的基礎學習能力，確認 Experience Replay + Target Network 的必要性。最終 win rate 100%。
 2. **HW3-2（Player Mode）**：比較 Basic DQN / Double DQN / Dueling DQN 三種方法，探討在隨機起始位置下的泛化表現。三者均達到 100% final win rate，Double DQN 後期最穩定。
-3. **HW3-3（Random Mode）**：（進行中）探討全隨機環境下的梯度穩定技巧與 PER。
+3. **HW3-3（Random Mode）**：採用 PyTorch Lightning 架構，整合 Gradient Clipping、LR Scheduling、Exponential ε-decay、PER，E3 全體 win rate 85.2% 為正式最優方法。另有 Rainbow Bonus（E4）。
 
 最終目標：理解各改進方法的原理，並展示它們如何從 Naive DQN 逐步演進到 Rainbow DQN。
 
@@ -30,7 +30,7 @@ GridWorld 4×4 格子世界，包含 Player、Goal、Pit、Wall 四種物件：
 |------|------|------|-----------|
 | Static | ★☆☆ | 所有物件固定 | ✅ HW3-1 完成 |
 | Player | ★★☆ | Player 隨機、Goal/Pit/Wall 固定 | ✅ HW3-2 完成 |
-| Random | ★★★ | 全部物件隨機 | 🔄 HW3-3 進行中 |
+| Random | ★★★ | 全部物件隨機 | ✅ HW3-3 完成（E3 final_wr 90.0%）|
 
 **獎勵設計**：Goal +10，Pit -10，每步 -1（最多 50 步）。
 
