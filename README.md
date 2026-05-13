@@ -1,9 +1,9 @@
 # 🧠 DRL HW3: DQN and its Variants
 
-> **課程**：深度強化學習（Deep Reinforcement Learning）  
-> **作業**：Homework 3 — DQN and its Variants  
-> **截止日**：2026-05-13  
-> **作者**：Tony Lo（中興大學）  
+> **課程**：深度強化學習（Deep Reinforcement Learning）
+> **作業**：Homework 3 — DQN and its Variants
+> **截止日**：2026-05-13
+> **作者**：Tony Lo（中興大學）
 > **評分佔比**：10%
 
 ---
@@ -26,7 +26,7 @@
 ## 🗂️ 專案結構
 
 ```
-DRL_HW3_DQN_Variants/
+DRL_DQN_Variants/
 ├── README.md                        ← 本文件
 ├── PROJECT_CHARTER.md               ← 作業目標與子任務定位
 ├── ASSIGNMENT_REQUIREMENTS.md       ← 評分標準原文整理

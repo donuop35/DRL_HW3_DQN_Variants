@@ -1,7 +1,7 @@
 # REPRODUCIBILITY — DRL HW3: DQN and its Variants
 
-> **文件版本**：v1.0  
-> **建立日期**：2026-05-13  
+> **文件版本**：v1.0
+> **建立日期**：2026-05-13
 > **作者**：Tony Lo
 
 ---
@@ -125,7 +125,7 @@ episode,reward,loss,epsilon,steps,timestamp
 ```bash
 # 1. 克隆 Repo
 git clone https://github.com/donuop35/DRL_DQN_Variants.git
-cd DRL_HW3_DQN_Variants
+cd DRL_DQN_Variants
 
 # 2. 建立環境
 conda env create -f environment.yml
@@ -159,8 +159,8 @@ python scripts/generate_report_assets.py
 
 ## 7. 數據誠信聲明（Data Integrity Statement）
 
-> 本作業所有實驗結果均來自真實執行。  
-> 不得假造、篡改、或複製他人的實驗數據。  
+> 本作業所有實驗結果均來自真實執行。
+> 不得假造、篡改、或複製他人的實驗數據。
 > 所有圖表必須由 `scripts/generate_report_assets.py` 從真實 CSV 數據生成。
 
 ---
