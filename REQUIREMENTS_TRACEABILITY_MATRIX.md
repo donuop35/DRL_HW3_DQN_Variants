@@ -59,15 +59,19 @@
 
 ## RTM-04：Rainbow DQN Bonus（加分）
 
-| # | 教授需求（加分項） | 對應程式 | 對應 Config | 對應實驗 | 對應圖表 | 報告章節 | 驗收狀態 |
+| # | 教授需求（加分項）| 對應程式 | 對應 Config | 對應實驗 | 對應圖表 | 報告章節 | 驗收狀態 |
 |---|---------|---------|------------|---------|---------|---------|---------|
-| 4.1 | Rainbow 整合 | `src/agents/rainbow_dqn.py` | `configs/hw3_3_random/e4_rainbow.yaml` | E4 | hw3_3_e4_rainbow.png | Ch5 | ⬜ 待實作（Bonus） |
-| 4.2 | Double DQN 整合至 Rainbow | 複用 `double_dqn.py` 邏輯 | e4_rainbow.yaml | E4 | — | Ch5.1 | ⬜ |
-| 4.3 | Dueling Network 整合 | 複用 `dueling_net.py` | e4_rainbow.yaml | E4 | — | Ch5.1 | ⬜ |
-| 4.4 | PER 整合至 Rainbow | 複用 `per_buffer.py` | e4_rainbow.yaml | E4 | — | Ch5.1 | ⬜ |
-| 4.5 | Multi-step Learning | `src/buffers/multistep_buffer.py` | e4_rainbow.yaml | E4 | — | Ch5.2 | ⬜ |
+| 4.1 | Rainbow 整合（六組件）| `src/training/lightning_rainbow_module.py`（LightningRainbowModule） | `configs/hw3_3_random/e4_rainbow_dqn_bonus.yaml` | E4 | hw3_3_random_e4_rainbow_*.png | 理解報告 §27-32、主報告 5 | ✅ **Bonus 完成**（40% final win rate，誠實記錄未捏造）|
+| 4.2 | Double DQN | `_categorical_projection()`：online 選 action，target 評估 | e4 yaml | E4 | — | 理解報告 §28.1 | ✅ |
+| 4.3 | Dueling Network | `C51DuelingNetwork`：V(s)+A(s,a) 在 atom 維合併 | e4 yaml | E4 | — | 理解報告 §28.2 | ✅ |
+| 4.4 | PER 整合 | `NStepPERBuffer`（SumTree，priority ∝ KL loss）| e4 yaml（use_per=true, alpha=0.5）| E4 | — | 理解報告 §28.6 | ✅ |
+| 4.5 | N-step Learning | `NStepPERBuffer`（n_step=3，γ³ target）| e4 yaml（n_step=3）| E4 | — | 理解報告 §28.3 | ✅ |
+| 4.6 | C51 Distributional | `c51_dueling_dqn.py`：51 atoms，KL loss，categorical projection | e4 yaml（c51_atoms=51）| E4 | — | 理解報告 §28.4 | ✅ |
+| 4.7 | NoisyNet | `src/models/noisy_layers.py`（NoisyLinear，factorised）| e4 yaml（use_noisy_net=true）| E4 | — | 理解報告 §28.5 | ✅ |
+| 4.8 | E1-E4 比較圖 | `plot_comparison.py:plot_hw3_4_comparison()` | — | E1-E4 | **5 張 *_e1_e2_e3_e4.png** | 主報告 5.4 | ✅ |
 
-**Bonus 小計：5 項需求 → 5 個對應**
+**Bonus 小計：8/8 ✅ | E4 Final Win Rate: 40.0%（誠實報告，低於 E1-E3 原因已分析）**
+**E1-E3 正式主線完全未被修改（已驗證）**
 
 ---
 

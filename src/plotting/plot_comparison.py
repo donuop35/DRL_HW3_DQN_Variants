@@ -507,3 +507,51 @@ def plot_hw3_3_comparison(
 
     print(f"[Comparison] Generated {len(paths)} HW3-3 figures → {output_dir}/hw3_3_random_*.png")
     return paths
+
+
+# ── HW3-3 E4 Bonus 全套比較圖（E1-E4，dict 介面）────────────────────────
+
+def plot_hw3_4_comparison(
+    csv_map: Dict[str, str],
+    output_dir,
+    window: int = 100,
+    title_prefix: str = "HW3-3 Random Mode",
+    smoke_test: bool = False,
+) -> dict:
+    """
+    HW3-3 E1/E2/E3/E4 四方比較全套圖。
+    （E4 Rainbow Bonus 加入比較；E1-E3 CSV 不改動）
+    """
+    output_dir = Path(output_dir)
+    labels     = list(csv_map.keys())
+    csv_paths  = [csv_map[k] for k in labels]
+    paths      = {}
+
+    paths["reward"] = plot_reward_comparison(
+        csv_paths, output_dir / "hw3_3_random_reward_comparison_e1_e2_e3_e4.png",
+        window=window, title=f"{title_prefix} — Reward (E1-E4 incl. Bonus)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["win_rate"] = plot_win_rate_comparison(
+        csv_paths, output_dir / "hw3_3_random_win_rate_comparison_e1_e2_e3_e4.png",
+        window=window, title=f"{title_prefix} — Win Rate (E1-E4 incl. Bonus)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["loss"] = plot_loss_comparison(
+        csv_paths, output_dir / "hw3_3_random_loss_comparison_e1_e2_e3_e4.png",
+        window=window, title=f"{title_prefix} — Loss (E1-E4 incl. Bonus)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["steps"] = plot_steps_comparison(
+        csv_paths, output_dir / "hw3_3_random_steps_comparison_e1_e2_e3_e4.png",
+        window=window, title=f"{title_prefix} — Steps (E1-E4 incl. Bonus)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["final_bar"] = plot_final_performance_bar(
+        csv_paths, output_dir / "hw3_3_random_final_metrics_e1_e2_e3_e4.png",
+        metric="final_win_rate", window=window,
+        title=f"{title_prefix} — Final Win Rate E1-E4 (last {window} ep)",
+        labels=labels, smoke_test=smoke_test)
+
+    print(f"[Comparison] Generated {len(paths)} E1-E4 comparison figures → {output_dir}/hw3_3_random_*_e1_e2_e3_e4.png")
+    return paths

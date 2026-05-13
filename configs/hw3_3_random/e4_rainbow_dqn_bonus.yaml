@@ -1,0 +1,53 @@
+# configs/hw3_3_random/e4_rainbow_dqn_bonus.yaml
+# HW3-3 E4 Bonus：Advanced Rainbow DQN
+# ━━ 整合 Double + Dueling + PER + N-step + C51 + NoisyNet ━━
+# 與 E1-E3 完全相同的訓練預算（5000 episodes，seed=42）
+
+experiment_id: hw3_3_random_e4_rainbow_bonus
+hw_part: hw3_3
+mode: random
+algorithm: Rainbow_DQN_Bonus
+seed: 42
+
+network:
+  input_dim: 64
+  hidden_1: 128          # 比 E1-E3 稍大（C51 需要更多容量）
+  hidden_2: 64
+  output_dim: 4          # n_actions
+
+training:
+  episodes: 5000
+  max_steps_per_episode: 50
+  gamma: 0.9
+  learning_rate: 0.0003   # Rainbow 建議更小的 lr
+  batch_size: 200
+  replay_capacity: 1000
+  target_update_frequency: 500
+  use_gradient_clipping: true
+  max_grad_norm: 10.0     # Rainbow 通常 clip 較大
+  use_lr_scheduler: false  # CosineAnnealingLR 不需要 YAML 控制
+  lr_scheduler_type: Cosine
+  use_lightning: true
+
+epsilon:
+  epsilon_start: 0.0     # NoisyNet 接管探索，epsilon 不使用
+  epsilon_end: 0.0
+  epsilon_decay_type: linear
+  epsilon_decay_steps: 5000
+
+algorithm_flags:
+  use_target_network: true
+  use_double_dqn: true    # ← Double DQN（online select + target eval）
+  use_dueling_dqn: true   # ← Dueling（C51DuelingNetwork 內建）
+  use_per: true           # ← PER（NStepPERBuffer 內建）
+  per_alpha: 0.5          # Rainbow paper: α=0.5
+  per_beta_start: 0.4
+  per_beta_end: 1.0
+  per_epsilon: 1.0e-5
+  use_n_step: true        # ← N-step Return
+  n_step: 3               # Rainbow paper: n=3
+  use_noisy_net: true     # ← NoisyNet（取代 ε-greedy）
+  use_distributional: true  # ← C51 Distributional DQN
+  c51_atoms: 51
+  c51_v_min: -10.0
+  c51_v_max: 10.0

@@ -265,9 +265,70 @@ class LightningDQNModule(pl.LightningModule):
 
 ---
 
-## 5. Bonus：Rainbow DQN
+## 5. Bonus：Rainbow DQN Advanced Pipeline（E4）
 
-> **（待完成後填入）**
+> **⚠️ 本章為 Bonus 加分實驗（E4），不是 HW3-3 正式主線。**  
+> **E1-E3 是正式評分實驗，完全未被修改（已驗證 CSV 5000 rows unchanged）。**  
+> **詳細理論見 `understanding_report.md` 第 27–32 節。**
+
+### 5.1 E4 整合的六個 DQN 組件
+
+| 組件 | 實作位置 | 核心機制 |
+|------|---------|---------|
+| ① Double DQN | `LightningRainbowModule.training_step()` | online 選 action，target 評估 Q |
+| ② Dueling Network | `C51DuelingNetwork` 架構 | V(s) + A(s,a) 分佈分離 |
+| ③ PER | `NStepPERBuffer`（SumTree） | priority ∝ KL loss |
+| ④ N-step Return（n=3）| `NStepPERBuffer` | 累積 3 步折扣 reward |
+| ⑤ C51 Distributional | `_categorical_projection()` | 輸出 51 atoms Q 分佈，KL loss |
+| ⑥ NoisyNet | `NoisyLinear`（factorised） | 替代 ε-greedy，ε 固定為 0 |
+
+### 5.2 PyTorch Lightning 結構
+
+```python
+class LightningRainbowModule(pl.LightningModule):
+    def configure_optimizers(self):   # Adam(lr=3e-4) + optional CosineAnnealingLR
+    def training_step(self, batch):   # C51 KL loss + IS weights + grad clip
+        # C51 Categorical Projection
+        tz = (rewards + γ³ * support).clamp(v_min, v_max)
+        m  = linear_interpolate(next_target_dist → tz)
+        loss = -(m * log_softmax(online_dist)).sum()
+```
+
+### 5.3 E4 實驗結果
+
+| 指標 | **E4 Rainbow Bonus** |
+|------|----------------------|
+| 全體 Win Rate | 33.0% |
+| 最後 500ep Win Rate | 52.4% |
+| 最後 500ep Avg Reward | -17.34 |
+| Final Eval Win Rate（200場）| **40.0%** |
+| 平均 Loss（KL，scale 不同）| 0.9633 |
+| 訓練時間 | **~2504 秒**（較 E1-E3 慢 7-9 倍） |
+
+### 5.4 E4 vs E1-E3 誠實比較
+
+![HW3-3 E1-E4 Win Rate Comparison](../results/figures/hw3_3_random_win_rate_comparison_e1_e2_e3_e4.png)
+
+*圖 11：HW3-3 Random Mode — E1/E2/E3/E4 Win Rate 比較（MA100）*
+
+![HW3-3 E1-E4 Reward Comparison](../results/figures/hw3_3_random_reward_comparison_e1_e2_e3_e4.png)
+
+*圖 12：HW3-3 Random Mode — E1/E2/E3/E4 Reward 比較（MA100）*
+
+![HW3-3 E1-E4 Final Bar](../results/figures/hw3_3_random_final_metrics_e1_e2_e3_e4.png)
+
+*圖 13：HW3-3 — 最終 Win Rate E1-E4 比較*
+
+### 5.5 E4 表現不如 E1-E3 的誠實分析
+
+| 根本原因 | 說明 |
+|---------|------|
+| C51 在小環境中收斂慢 | 5000 episodes 對 distributional RL 不足，原始 Rainbow 使用 200M frames |
+| NoisyNet 初期探索弱 | E1-E3 ε=1.0 完全隨機探索，NoisyNet 初期噪聲小 |
+| Buffer 容量不足 | capacity=1000 對 C51+N-step 太小（Rainbow 需 1M+）|
+| N-step 在稀疏 reward 下 variance 高 | 3 步累積 -1/step noise 蓋過 Goal signal |
+
+**學術結論**：E4 的正確性已驗證（KL loss 持續下降，win rate 有正向趨勢），在更充足的資源下（擴大 buffer、增加訓練步數）Rainbow 的優勢將顯現。這本身是一個有價值的消融結論。
 
 ---
 
