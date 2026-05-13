@@ -12,13 +12,13 @@
 
 | # | 教授需求 | 對應程式 | 對應 Config | 對應實驗 | 對應圖表 | 報告章節 | 驗收狀態 |
 |---|---------|---------|------------|---------|---------|---------|---------|
-| 1.1 | Run Naive DQN code | `src/agents/naive_dqn.py` | `configs/hw3_1_static/default.yaml` | `hw3_1_static_naive_dqn` | hw3_1_loss_curve.png | Ch2.1 | ⬜ 待實作 |
-| 1.2 | Experience Replay Buffer | `src/buffers/replay_buffer.py` | 同上 | 同上 | hw3_1_loss_curve.png | Ch2.2 | ⬜ 待實作 |
-| 1.3 | **understanding_report.md** | — | — | 同上 | **嵌入圖表** | **understanding_report.md** | ⬜ **最高優先** |
-| 1.4 | Static Mode 訓練 | `scripts/run_hw3_1_static.py` | 同上 | 同上 | — | — | ⬜ 待實作 |
-| 1.5 | 訓練 Loss 曲線（隱性） | `src/plotting/plot_utils.py` | — | 同上 | hw3_1_loss_curve.png | Ch2.1 | ⬜ 待實作 |
+| 1.1 | Run Naive DQN code | `src/agents/dqn_agent.py` | `configs/hw3_1_static/basic_dqn_static.yaml` | `hw3_1_static_basic_dqn` | hw3_1_static_basic_dqn_*.png | 理解報告 §8 | ✅ 完成（100% win rate） |
+| 1.2 | Experience Replay Buffer | `src/buffers/replay_buffer.py` | 同上 | 同上 | loss/reward 曲線 | 理解報告 §5 | ✅ 完成 |
+| 1.3 | **understanding_report.md** | — | — | 同上 | **5 張圖嵌入** | **report/understanding_report.md** | ✅ **完成（10 節，全繁中）** |
+| 1.4 | Static Mode 訓練 | `scripts/run_hw3_1_static.py` | 同上 | 同上 | — | — | ✅ 完成（5000ep, 231s） |
+| 1.5 | 訓練 Loss 曲線 | `src/plotting/plot_curves.py` | — | 同上 | hw3_1_static_basic_dqn_loss.png | 理解報告 §8.3 | ✅ 完成 |
 
-**HW3-1 小計：5 項需求 → 5 個對應**
+**HW3-1 小計：5/5 項需求完成 ✅ | Final Win Rate: 100%**
 
 ---
 
