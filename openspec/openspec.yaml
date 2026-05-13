@@ -1,0 +1,42 @@
+# OpenSpec Configuration
+# DRL HW3: DQN and its Variants
+
+version: "1.0"
+project:
+  name: "DRL-HW3-DQN-Variants"
+  description: "深度強化學習作業 HW3：DQN and its Variants"
+  repo: "https://github.com/donuop35/DRL_DQN_Variants"
+
+tools:
+  - name: antigravity
+    role: primary_developer
+    description: "Antigravity AI coding assistant for spec-driven development"
+
+workflow:
+  profile: research-assignment
+  change_prefix: "CHG"
+  design_prefix: "DES"
+  task_prefix: "TASK"
+
+phases:
+  - id: phase-1
+    name: "Repo Bootstrap + OpenSpec 初始化"
+    status: in-progress
+  - id: phase-2
+    name: "HW3-1 Naive DQN 實作"
+    status: pending
+  - id: phase-3
+    name: "HW3-2 Double/Dueling DQN 實作"
+    status: pending
+  - id: phase-4
+    name: "HW3-3 Random Mode + Training Tips"
+    status: pending
+  - id: phase-5
+    name: "Rainbow Bonus + 報告整合"
+    status: pending
+
+conventions:
+  language: "繁體中文（英文專業名詞可保留）"
+  seed: 42
+  branch_strategy: "feature branches per CHG"
+  commit_convention: "conventional commits"
