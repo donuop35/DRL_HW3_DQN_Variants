@@ -86,21 +86,71 @@ conda activate drl-hw3
 pip install -r requirements.txt
 ```
 
-### 執行實驗
+### Step 0：Smoke Test（必須先通過）
 
 ```bash
-# HW3-1: Naive DQN (Static Mode)
-python scripts/run_hw3_1_static.py
+# 驗證 harness 可用（config / logger / metrics / plotting）
+python scripts/smoke_test.py
 
-# HW3-2: Double DQN + Dueling DQN (Player Mode)
+# 預期輸出：11 PASSED / 0 FAILED ✅
+# ⚠️ Smoke test 產生的圖表標記為 SMOKE TEST，不得用於正式報告
+```
+
+### Step 1：執行 HW3-1（Static Mode）
+
+```bash
+# 執行 Naive DQN 訓練（5000 episodes）
+python scripts/run_hw3_1_static.py \
+  --config configs/hw3_1_static/default.yaml
+
+# 結果輸出至：
+# - results/csv/hw3_1_static_naive_dqn_log.csv
+# - results/figures/hw3_1_static_naive_dqn_*.png
+# - results/checkpoints/hw3_1_static_naive_dqn/
+```
+
+### Step 2：執行 HW3-2（Player Mode）
+
+```bash
+# 執行三個演算法比較
 python scripts/run_hw3_2_player.py
 
-# HW3-3: Enhanced DQN (Random Mode)
-python scripts/run_hw3_3_random.py
-
-# 所有實驗一次執行
-python scripts/run_all_experiments.py
+# 個別執行：
+python scripts/run_hw3_2_player.py --config configs/hw3_2_player/naive_dqn.yaml
+python scripts/run_hw3_2_player.py --config configs/hw3_2_player/double_dqn.yaml
+python scripts/run_hw3_2_player.py --config configs/hw3_2_player/dueling_dqn.yaml
 ```
+
+### Step 3：執行 HW3-3（Random Mode，E1→E3）
+
+```bash
+# E1：Baseline（無 Training Tips）
+python scripts/run_hw3_3_random.py --config configs/hw3_3_random/e1_baseline.yaml
+
+# E2：Stabilized（Gradient Clipping + LR Scheduling）
+python scripts/run_hw3_3_random.py --config configs/hw3_3_random/e2_stabilized.yaml
+
+# E3：PER + Stabilization
+python scripts/run_hw3_3_random.py --config configs/hw3_3_random/e3_per.yaml
+
+# E4：Rainbow Bonus（不影響 E1-E3）
+python scripts/run_hw3_3_random.py --config configs/hw3_3_random/e4_rainbow.yaml
+```
+
+### Step 4：生成報告圖表
+
+```bash
+# 從真實 CSV 生成所有正式圖表
+python scripts/generate_report_assets.py
+
+# 生成所有實驗
+python scripts/run_all_experiments.py --seed 42
+```
+
+> ⚠️ **重要**：所有執行步驟請參考 [EXPERIMENT_PROTOCOL.md](EXPERIMENT_PROTOCOL.md)。  
+> 所有圖表必須由真實 CSV 生成，不得手動修改數據。
+
+> 📝 **注意**：此區塊將在正式訓練腳本完成後更新（Phase 4）。
 
 ---
 
