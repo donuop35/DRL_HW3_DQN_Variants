@@ -1,0 +1,4 @@
+experiment_id,algorithm,final_eval_win_rate,total_episodes,all_win_rate,last500_win_rate,last500_avg_reward,last500_avg_steps,avg_loss,max_lr,min_lr,hw_part,mode,seed,episodes
+hw3_2_player_basic_dqn,Basic DQN,1.0,5000,0.861,0.994,5.606,5.3,0.004825,0.001,0.001,HW3-2,player,42,5000
+hw3_2_player_double_dqn,Double DQN,1.0,5000,0.8618,1.0,5.832,5.2,0.005214,0.001,0.001,HW3-2,player,42,5000
+hw3_2_player_dueling_dqn,Dueling DQN,1.0,5000,0.8622,0.992,5.642,5.2,0.003982,0.001,0.001,HW3-2,player,42,5000

@@ -1,0 +1,9 @@
+label,hw_part,mode,algorithm,seed,episodes,all_win_rate,last500_win_rate,last500_avg_reward,last500_avg_steps,avg_loss,final_eval_win_rate,experiment_id
+S-static,HW3-1,static,Basic DQN,42,5000,0.7554,0.986,2.43,8.3,0.005366,1.0,hw3_1_static_basic_dqn
+P1,HW3-2,player,Basic DQN,42,5000,0.861,0.994,5.606,5.3,0.004825,1.0,hw3_2_player_basic_dqn
+P2,HW3-2,player,Double DQN,42,5000,0.8618,1.0,5.832,5.2,0.005214,1.0,hw3_2_player_double_dqn
+P3,HW3-2,player,Dueling DQN,42,5000,0.8622,0.992,5.642,5.2,0.003982,1.0,hw3_2_player_dueling_dqn
+E1,HW3-3,random,E1 Baseline,42,5000,0.7962,0.952,5.236,5.0,0.106479,0.915,hw3_3_random_e1_baseline
+E2,HW3-3,random,E2 Stabilized,42,5000,0.8234,0.908,2.408,7.4,0.598633,0.885,hw3_3_random_e2_stabilized
+E3,HW3-3,random,E3 PER+Stab,42,5000,0.8524,0.918,2.802,7.1,0.209635,0.9,hw3_3_random_e3_per_stabilized
+E4-Bonus,HW3-3-Bonus,random,E4 Rainbow,42,5000,0.3296,0.524,-17.34,22.2,0.963343,0.4,hw3_3_random_e4_rainbow_bonus

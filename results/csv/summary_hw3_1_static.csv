@@ -1,0 +1,2 @@
+experiment_id,hw_part,mode,algorithm,seed,episodes,total_episodes,all_win_rate,last500_win_rate,last500_avg_reward,last500_avg_steps,avg_loss,max_lr,min_lr,final_eval_win_rate,final_eval_avg_reward,final_eval_avg_steps,notes
+hw3_1_static_basic_dqn,HW3-1,static,Basic DQN,42,5000,5000,0.7554,0.986,2.43,8.3,0.005366,0.001,0.001,1.0,,7.0,100% final eval win rate; training time 231.9s
