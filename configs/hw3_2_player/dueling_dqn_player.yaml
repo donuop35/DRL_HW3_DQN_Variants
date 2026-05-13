@@ -1,0 +1,53 @@
+# configs/hw3_2_player/dueling_dqn_player.yaml
+# HW3-2 P3：Dueling DQN（+S4 Value-Advantage Decomposition），Player Mode
+
+experiment_id: hw3_2_player_dueling_dqn
+hw_part: hw3_2
+mode: player
+algorithm: DuelingDQN
+seed: 42
+
+network:
+  input_dim: 64
+  hidden_1: 150
+  hidden_2: 100
+  output_dim: 4
+
+training:
+  episodes: 5000
+  max_steps_per_episode: 50
+  gamma: 0.9
+  learning_rate: 0.001
+  batch_size: 200
+  replay_capacity: 1000
+  target_update_frequency: 500
+  use_gradient_clipping: false
+  max_grad_norm: 1.0
+  use_lr_scheduler: false
+  lr_scheduler_type: StepLR
+  lr_scheduler_step_size: 500
+  lr_scheduler_gamma: 0.9
+  use_lightning: false
+
+epsilon:
+  epsilon_start: 1.0
+  epsilon_end: 0.1
+  epsilon_decay_type: linear
+  epsilon_decay_steps: 5000
+
+algorithm_flags:
+  use_target_network: true
+  use_double_dqn: false
+  use_dueling_dqn: true     # ← Dueling：V(s) + A(s,a) - mean(A)
+  use_per: false
+  per_alpha: 0.6
+  per_beta_start: 0.4
+  per_beta_end: 1.0
+  per_epsilon: 1.0e-5
+  use_n_step: false
+  n_step: 3
+  use_noisy_net: false
+  use_distributional: false
+  c51_atoms: 51
+  c51_v_min: -10.0
+  c51_v_max: 10.0

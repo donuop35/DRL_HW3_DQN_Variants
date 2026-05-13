@@ -283,36 +283,112 @@ def plot_hw3_2_comparison(
 
     return paths
 
+def plot_steps_comparison(
+    csv_paths: list,
+    output_path,
+    window: int = 100,
+    title: str = "Algorithm Comparison — Steps per Episode",
+    labels=None,
+    smoke_test: bool = False,
+):
+    """多實驗 Steps per Episode 移動平均比較圖。"""
+    _apply_style()
+    fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+
+    for i, csv_path in enumerate(csv_paths):
+        df = load_experiment_log(csv_path)
+        df = add_moving_averages(df, window=window)
+        alg = labels[i] if labels else df["algorithm"].iloc[0] if "algorithm" in df.columns else f"Exp{i}"
+        color = _get_color(alg, i)
+        if "steps_ma" not in df.columns:
+            df["steps_ma"] = df["episode_steps"].rolling(window, min_periods=1).mean()
+        ax.plot(df["episode"], df["steps_ma"],
+                color=color, linewidth=2.0, label=f"{alg} (MA{window})")
+
+    ax.set_title(title, fontsize=14, pad=12)
+    ax.set_xlabel("Episode", fontsize=11)
+    ax.set_ylabel("Steps", fontsize=11)
+    ax.legend(fontsize=10)
+    ax.grid(True)
+    fig.tight_layout()
+    return _save_figure(fig, output_path, smoke_test=smoke_test)
+
+
+# ── HW3-2 專用全套比較圖（dict 介面，供 run_hw3_2_player.py 呼叫）──
+
+def plot_hw3_2_comparison(
+    csv_map: Dict[str, str],
+    output_dir,
+    window: int = 100,
+    title_prefix: str = "HW3-2 Player Mode",
+    smoke_test: bool = False,
+) -> dict:
+    """
+    HW3-2 三方比較全套圖（dict 介面）。
+
+    Args:
+        csv_map:     {label: csv_path} 字典，key 作為圖例標籤
+        output_dir:  輸出目錄
+        window:      移動平均視窗
+        title_prefix: 圖表標題前綴
+        smoke_test:  是否標記為 smoke test
+
+    Returns:
+        dict 包含各圖表路徑
+    """
+    output_dir = Path(output_dir)
+    labels     = list(csv_map.keys())
+    csv_paths  = [csv_map[k] for k in labels]
+    paths      = {}
+
+    paths["reward"] = plot_reward_comparison(
+        csv_paths, output_dir / "hw3_2_player_reward_comparison.png",
+        window=window, title=f"{title_prefix} — Reward",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["win_rate"] = plot_win_rate_comparison(
+        csv_paths, output_dir / "hw3_2_player_win_rate_comparison.png",
+        window=window, title=f"{title_prefix} — Win Rate",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["loss"] = plot_loss_comparison(
+        csv_paths, output_dir / "hw3_2_player_loss_comparison.png",
+        window=window, title=f"{title_prefix} — Loss",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["steps"] = plot_steps_comparison(
+        csv_paths, output_dir / "hw3_2_player_steps_comparison.png",
+        window=window, title=f"{title_prefix} — Steps per Episode",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["final_bar"] = plot_final_performance_bar(
+        csv_paths, output_dir / "hw3_2_player_final_metrics_bar.png",
+        metric="final_win_rate", window=window,
+        title=f"{title_prefix} — Final Win Rate (last {window} ep)",
+        labels=labels, smoke_test=smoke_test)
+
+    print(f"[Comparison] Generated {len(paths)} HW3-2 figures → {output_dir}/hw3_2_player_*.png")
+    return paths
+
 
 # ──────────────────────────────────────────────
 # HW3-3 專用：E1/E2/E3(/E4) 消融比較圖
 # ──────────────────────────────────────────────
 
 def plot_hw3_3_ablation(
-    e1_csv: str | Path,
-    e2_csv: str | Path,
-    e3_csv: str | Path,
-    output_dir: str | Path,
-    e4_csv: Optional[str | Path] = None,
+    e1_csv,
+    e2_csv,
+    e3_csv,
+    output_dir,
+    e4_csv=None,
     window: int = 100,
     smoke_test: bool = False,
 ) -> dict:
     """
     HW3-3 消融實驗比較圖（E1 vs E2 vs E3，選填 E4 Bonus）。
-
-    Args:
-        e1_csv, e2_csv, e3_csv: E1/E2/E3 CSV 路徑
-        output_dir:  輸出目錄
-        e4_csv:      E4 Rainbow Bonus CSV（可選）
-        window:      移動平均視窗
-        smoke_test:  是否標記為 smoke test
-
-    Returns:
-        dict 包含各圖表路徑
     """
     csv_paths = [e1_csv, e2_csv, e3_csv]
-    labels = ["E1_Baseline", "E2_Stabilized", "E3_PER"]
-
+    labels    = ["E1_Baseline", "E2_Stabilized", "E3_PER"]
     if e4_csv is not None:
         csv_paths.append(e4_csv)
         labels.append("E4_Rainbow")
@@ -337,3 +413,4 @@ def plot_hw3_3_ablation(
         labels=labels, smoke_test=smoke_test)
 
     return paths
+

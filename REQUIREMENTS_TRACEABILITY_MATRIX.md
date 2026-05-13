@@ -26,15 +26,16 @@
 
 | # | 教授需求 | 對應程式 | 對應 Config | 對應實驗 | 對應圖表 | 報告章節 | 驗收狀態 |
 |---|---------|---------|------------|---------|---------|---------|---------|
-| 2.1 | Double DQN 實作 | `src/agents/double_dqn.py` | `configs/hw3_2_player/double_dqn.yaml` | `hw3_2_player_double_dqn` | hw3_2_double_curve.png | Ch3.1 | ⬜ 待實作 |
-| 2.2 | Dueling DQN 實作 | `src/agents/dueling_dqn.py` + `src/models/dueling_net.py` | `configs/hw3_2_player/dueling_dqn.yaml` | `hw3_2_player_dueling_dqn` | hw3_2_dueling_curve.png | Ch3.2 | ⬜ 待實作 |
-| 2.3 | Player Mode 訓練 | `scripts/run_hw3_2_player.py` | 兩個 config | 兩個實驗 | — | — | ⬜ 待實作 |
-| 2.4 | 與 Basic DQN 比較 | `src/plotting/plot_utils.py` | — | `hw3_2_player_naive_dqn`（對照） | **hw3_2_comparison_all.png** | Ch3.3 | ⬜ 待實作 |
-| 2.5 | 改進原理說明 | — | — | — | — | Ch3.1/3.2 文字說明 | ⬜ 待撰寫 |
-| 2.6 | Double DQN 改善 overestimation（說明） | — | — | — | — | Ch3.1 | ⬜ 待撰寫 |
-| 2.7 | Dueling DQN 改善表示（說明） | — | — | — | — | Ch3.2 | ⬜ 待撰寫 |
+| 2.1 | Double DQN 實作 | `src/agents/dqn_agent.py`（use_double_dqn=true） | `configs/hw3_2_player/double_dqn_player.yaml` | `hw3_2_player_double_dqn` | hw3_2_player_*_comparison.png | 理解報告 §12、主報告 3.1 | ✅ 完成（100% win rate） |
+| 2.2 | Dueling DQN 實作 | `src/agents/dqn_agent.py`（use_dueling_dqn=true）+ `src/models/dqn.py:DuelingNet` | `configs/hw3_2_player/dueling_dqn_player.yaml` | `hw3_2_player_dueling_dqn` | 同上 | 理解報告 §13、主報告 3.2 | ✅ 完成（100% win rate） |
+| 2.3 | Player Mode 訓練（三組） | `scripts/run_hw3_2_player.py` | 3 個 yaml | P1/P2/P3 | — | — | ✅ 完成（P1/P2/P3 均 100%） |
+| 2.4 | 與 Basic DQN 比較 | `src/plotting/plot_comparison.py:plot_hw3_2_comparison` | — | 三組對比 | **hw3_2_player_*_comparison.png（5 張）** | 主報告 3.3 | ✅ 完成 |
+| 2.5 | 改進原理說明 | — | — | — | — | 理解報告 §12-13、主報告 3.1-3.2 | ✅ 完成 |
+| 2.6 | Double DQN 解決 Overestimation | — | — | — | — | 理解報告 §12 + 公式推導 | ✅ 完成 |
+| 2.7 | Dueling DQN 解決表示問題 | — | — | — | — | 理解報告 §13 + 架構圖 | ✅ 完成 |
 
-**HW3-2 小計：7 項需求 → 7 個對應**
+**HW3-2 小計：7/7 項需求完成 ✅ | 最佳 Double DQN，Final Win Rate: 100%**
+
 
 ---
 

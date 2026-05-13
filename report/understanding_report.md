@@ -1,13 +1,16 @@
-# DRL HW3-1 理解報告
+# DRL HW3 理解報告
 
 > **課程**：深度強化學習（Deep Reinforcement Learning）  
 > **作業**：Homework 3 — DQN and its Variants  
-> **子任務**：HW3-1 — Basic DQN on Static Mode GridWorld  
 > **作者**：Tony Lo（中興大學）  
 > **日期**：2026-05-13  
-> **實驗設定**：seed=42, episodes=5000, mode=static, 架構 64→150→100→4
+> **涵蓋**：HW3-1（Static Mode）、HW3-2（Player Mode）
 
 ---
+
+## HW3-1：Basic DQN on Static Mode（第 1–10 節）
+
+> **實驗設定**：seed=42, episodes=5000, mode=static, 架構 64→150→100→4
 
 ## 1. DQN 是什麼
 
@@ -406,3 +409,182 @@ Bonus：「所有改進整合 = Rainbow DQN」
 *本報告所有圖表與數值均來自真實訓練結果（seed=42, 5000 episodes），不含任何捏造數據。*
 
 *實驗詳細 log 見 `results/csv/hw3_1_static_basic_dqn_log.csv`。*
+
+
+---
+---
+
+## HW3-2：DQN Variants on Player Mode（第 11–17 節）
+
+> **實驗設定**：seed=42, episodes=5000, mode=player, 三組平行比較  
+> **實驗組**：P1 Basic DQN | P2 Double DQN | P3 Dueling DQN
+
+---
+
+## 11. Player Mode 的難度提升
+
+### 11.1 從 Static 到 Player 的變化
+
+HW3-1 的 Static Mode 中，Player 固定在 (0,3)，每局狀態分佈完全一致。HW3-2 的 **Player Mode** 引入關鍵變化：**Player 的初始位置在每局開始時隨機放置（不與其他物件重疊）**。Goal / Pit / Wall 位置不變，但 Agent 每局面對不同起始狀態。
+
+| 難度差異 | Static Mode | Player Mode |
+|---------|------------|------------|
+| 初始狀態種類 | 1 種（固定） | 多種（Player 位置隨機） |
+| 最優路徑 | 固定（7 步） | 因初始位置而異 |
+| 泛化需求 | 低 | 中等（需學習策略而非路徑） |
+| Q 值估計壓力 | 低 | 較高 |
+
+---
+
+## 12. Double DQN：解決 Overestimation Bias（S3）
+
+### 12.1 問題根源
+
+標準 DQN 的 TD Target：$y = r + \gamma \cdot \max_{a'} Q(s', a'; \theta^-)$
+
+問題：$\max$ 操作在噪聲存在時系統性高估 Q 值（Overestimation Bias）。
+
+數學直觀：設每個動作估計誤差 $\varepsilon \sim \mathcal{N}(0, \sigma^2)$，則：
+$$\mathbb{E}[\max_a (q_a + \varepsilon_a)] > \max_a q_a$$
+
+### 12.2 解法（van Hasselt et al., 2016）
+
+**解耦「選動作」與「評估 Q 值」兩步驟**：
+
+$$y^{\text{Double}} = r + \gamma \cdot Q\!\left(s',\ \arg\max_{a'} Q(s', a'; \theta);\ \theta^-\right)$$
+
+| 步驟 | 使用網路 | 任務 |
+|------|---------|------|
+| 選擇動作 $a^*$ | Online Network $\theta$ | 從當前估計選最好的動作 |
+| 評估 $Q(s', a^*)$ | Target Network $\theta^-$ | 用穩定網路評估 Q 值 |
+
+---
+
+## 13. Dueling DQN：Value-Advantage Decomposition（S4）
+
+### 13.1 分解公式（Wang et al., 2016）
+
+$$Q(s, a) = V(s) + \left[A(s, a) - \frac{1}{|\mathcal{A}|}\sum_{a'} A(s, a')\right]$$
+
+- $V(s)$：State Value，「這個狀態本身有多好」（與動作無關）
+- $A(s,a)$：Advantage，「選這個動作比平均好多少」
+- Mean normalization 確保分解唯一（可識別性）
+
+### 13.2 網路結構
+
+```
+state (64) → 共享特徵層 Linear(64→150)+ReLU
+                ↙                    ↘
+    Value stream              Advantage stream
+    Linear(150→100)+ReLU      Linear(150→100)+ReLU
+    Linear(100→1)             Linear(100→4)
+    V(s)                      A(s,a)
+                ↘                    ↙
+          Q = V + [A - mean(A)]
+```
+
+---
+
+## 14. 實驗設定
+
+| 超參數 | P1 Basic DQN | P2 Double DQN | P3 Dueling DQN |
+|--------|-------------|--------------|----------------|
+| Mode | player | player | player |
+| Network | QNetwork | QNetwork | DuelingNet |
+| use_double_dqn | ❌ | ✅ | ❌ |
+| use_dueling_dqn | ❌ | ❌ | ✅ |
+| 其餘超參數 | 完全相同（嚴格控制變因） |
+
+---
+
+## 15. 實驗結果
+
+### 15.1 量化比較（seed=42, 5000 episodes）
+
+| 指標 | P1 Basic DQN | P2 Double DQN | P3 Dueling DQN |
+|------|-------------|--------------|----------------|
+| 全體 Win Rate | 86.1% | 86.2% | 86.2% |
+| 最後 500ep Win Rate | 99.4% | **100.0%** | 99.2% |
+| 最後 500ep 平均 Reward | +5.61 | **+5.83** | +5.64 |
+| 最後 500ep 平均步數 | 5.3 步 | 5.2 步 | 5.2 步 |
+| 全體平均 Loss | 0.004825 | 0.005214 | **0.003982** |
+| Final Eval Win Rate（200 場）| 100.0% | 100.0% | 100.0% |
+
+### 15.2 圖表
+
+#### 比較圖 1：三方 Reward
+
+![HW3-2 Reward Comparison](../results/figures/hw3_2_player_reward_comparison.png)
+
+*圖 11：HW3-2 Player Mode — 三演算法 Reward 比較（MA100）*
+
+#### 比較圖 2：三方 Win Rate
+
+![HW3-2 Win Rate Comparison](../results/figures/hw3_2_player_win_rate_comparison.png)
+
+*圖 12：HW3-2 Player Mode — 三演算法 Win Rate 比較（MA100）*
+
+#### 比較圖 3：三方 Loss
+
+![HW3-2 Loss Comparison](../results/figures/hw3_2_player_loss_comparison.png)
+
+*圖 13：HW3-2 Player Mode — 三演算法 Loss 比較（MA100）*
+
+#### 比較圖 4：Steps 比較
+
+![HW3-2 Steps Comparison](../results/figures/hw3_2_player_steps_comparison.png)
+
+*圖 14：HW3-2 Player Mode — Steps per Episode 比較（MA100）*
+
+#### 比較圖 5：最終 Win Rate 柱狀圖
+
+![HW3-2 Final Bar](../results/figures/hw3_2_player_final_metrics_bar.png)
+
+*圖 15：HW3-2 Player Mode — 最終 Win Rate 比較（最後 100 episodes）*
+
+---
+
+## 16. 分析討論
+
+### 16.1 Player Mode vs Static Mode
+
+| 指標 | HW3-1 Static（Basic DQN） | HW3-2 Player（Double DQN） |
+|------|--------------------------|----------------------------|
+| 全體 Win Rate | 75.5% | 86.2% |
+| 最後 500ep Win Rate | 98.6% | 100.0% |
+| Final Eval Win Rate | 100.0% | 100.0% |
+| 平均步數 | 8.3 步 | 5.2 步 |
+
+> **有趣發現**：Player Mode 的全體 win rate（86.2%）反而高於 Static Mode（75.5%）！原因：多樣起始點提供了更豐富的訓練信號，使 Agent 學到更通用的策略。
+
+### 16.2 三種演算法細微差異
+
+- **Double DQN**：後期 win rate 最穩定（100%），reward 最高（+5.83）。Overestimation reduction 帶來更穩定的收斂
+- **Dueling DQN**：loss 最低（0.003982），Q 函數估計精度最高
+- **差異不大原因**：Player Mode 對 DQN 而言仍然相對簡單，三者均能在 5000ep 內充分收斂。Random Mode 預期差異更明顯
+
+---
+
+## 17. HW3-2 → HW3-3 銜接
+
+### 17.1 為什麼 Random Mode 更難
+
+| 挑戰 | Player Mode | Random Mode |
+|------|------------|------------|
+| Goal 位置固定？ | ✅ | ❌ 隨機 |
+| Pit 位置固定？ | ✅ | ❌ 隨機 |
+| Wall 位置固定？ | ✅ | ❌ 隨機 |
+| 獎勵稀疏程度 | 中等 | **高** |
+| 梯度穩定性 | 良好 | **容易不穩定** |
+
+### 17.2 HW3-3 需要的技術
+
+1. **Gradient Clipping**（E2）：防止稀疏獎勵導致梯度爆炸
+2. **LR Scheduling**（E2）：後期降低學習率，避免已收斂策略被破壞
+3. **PER（Prioritized Experience Replay）**（E3）：讓稀少但重要的「Goal 獲得」經驗更頻繁被學習
+
+---
+
+*HW3-2 所有數值均來自真實訓練結果（seed=42, 5000 episodes），不含任何捏造數據。*
+
+*實驗 log 見 `results/csv/hw3_2_player_*_dqn_log.csv`。*
