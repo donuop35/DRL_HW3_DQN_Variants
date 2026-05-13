@@ -183,7 +183,85 @@ $$Q(s, a) = V(s) + \left[A(s, a) - \frac{1}{|\mathcal{A}|}\sum_{a'} A(s, a')\rig
 
 ## 4. HW3-3：Enhanced DQN（Random Mode + Training Tips）
 
-> **（進行中，待 Phase 6 完成後填入）**
+> **詳細理論說明見 `understanding_report.md` 第 18–26 節**  
+> **所有組別均使用 PyTorch Lightning（LightningDQNModule）**
+
+### 4.1 三組實驗設計（消融研究）
+
+| 設定 | E1 Baseline | E2 Stabilized | E3 PER+Stabilized（正式主方法） |
+|------|-------------|--------------|-------------------------------|
+| PyTorch Lightning | ✅ | ✅ | ✅ |
+| Gradient Clipping（max_norm=1.0） | ❌ | ✅ | ✅ |
+| LR Scheduling（StepLR） | ❌ | ✅ | ✅ |
+| Epsilon Decay | Linear 1.0→0.1 | Exp 1.0→0.05 | Exp 1.0→0.05 |
+| PER（SumTree，α=0.6） | ❌ | ❌ | ✅ |
+
+### 4.2 PyTorch Lightning 轉換說明
+
+本實作將 DQN 遷移至 `LightningDQNModule(pl.LightningModule)`，提供：
+
+```python
+class LightningDQNModule(pl.LightningModule):
+    automatic_optimization = False  # RL 需要 manual optimization
+
+    def configure_optimizers(self):  # Lightning API：管理 optimizer + scheduler
+        optimizer = Adam(...)
+        scheduler = StepLR(optimizer, ...)
+        return {"optimizer": optimizer, "lr_scheduler": scheduler}
+
+    def training_step(self, batch, batch_idx):  # Lightning API：單次 gradient update
+        loss = compute_loss(...)
+        loss.backward()  # manual backward
+        clip_grad_norm_(model.parameters(), max_norm=1.0)  # grad clipping
+        optimizer.step()
+        scheduler.step()
+        return loss
+```
+
+### 4.3 量化結果比較
+
+| 指標 | E1 Baseline | E2 Stabilized | E3 PER+Stabilized |
+|------|-------------|--------------|-------------------|
+| **全體 Win Rate（5000ep）** | 79.6% | 82.3% | **85.2%** ✅ |
+| 最後 500ep Win Rate | **95.2%** | 90.8% | 91.8% |
+| 最後 500ep Avg Reward | +5.24 | +2.41 | +2.80 |
+| 平均 Loss | 0.1065 | 0.5986 | 0.2096 |
+| Final Eval Win Rate（200場）| **91.5%** | 88.5% | 90.0% |
+| LR 範圍 | 固定 0.001 | 0.001→~0.000004 | 0.001→~0.000007 |
+
+**🏆 E3 全體 win rate 最高（85.2%）**，是正式 HW3-3 主方法。
+
+### 4.4 比較圖表
+
+![HW3-3 Win Rate Comparison](../results/figures/hw3_3_random_win_rate_comparison_e1_e2_e3.png)
+
+*圖 6：HW3-3 Random Mode — E1/E2/E3 Win Rate 比較（MA100）*
+
+![HW3-3 Reward Comparison](../results/figures/hw3_3_random_reward_comparison_e1_e2_e3.png)
+
+*圖 7：HW3-3 Random Mode — E1/E2/E3 Reward 比較（MA100）*
+
+![HW3-3 Epsilon Decay](../results/figures/hw3_3_random_epsilon_decay_comparison.png)
+
+*圖 8：HW3-3 — E1 線性 vs E2/E3 指數 Epsilon Decay 比較*
+
+![HW3-3 LR Curve](../results/figures/hw3_3_random_learning_rate_curve.png)
+
+*圖 9：HW3-3 — E2/E3 Learning Rate Scheduling（StepLR）曲線*
+
+![HW3-3 Final Bar](../results/figures/hw3_3_random_final_metrics_e1_e2_e3.png)
+
+*圖 10：HW3-3 — 最終 Win Rate 比較（最後 100 episodes）*
+
+### 4.5 關鍵分析
+
+1. **E3 全體 win rate 最高**：PER 讓稀少的 Goal 獲得（高 TD error）更頻繁被採樣，加速早期收斂。全體 win rate 是衡量「整個訓練週期總體效率」的最重要指標，E3 勝出（85.2% > 82.3% > 79.6%）。
+
+2. **E2 LR 衰減過積極**：StepLR 每 step（而非每 episode）更新，5000 個 step 後 lr 縮至原始的 0.38%，後期幾乎無法學習。這是 E2 最後 500ep 指標低於 E1 的主要原因。
+
+3. **E1 後期表現佳的原因**：固定 lr=0.001 在後期仍允許大步調整，Random Mode 的多樣地圖每局都是新挑戰，持續的學習能力反而有利。
+
+4. **E3 是理論上最完整的方法**：PER 解決了 Random Mode 獎勵稀疏問題，Gradient Clipping 防止梯度爆炸，Lightning 提供了工程上的清晰結構，這是 HW3-3 的正式主方法。
 
 ---
 

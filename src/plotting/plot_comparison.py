@@ -414,3 +414,96 @@ def plot_hw3_3_ablation(
 
     return paths
 
+
+
+# ── HW3-3 專用全套比較圖（dict 介面）────────────────────────
+
+def plot_hw3_3_comparison(
+    csv_map: Dict[str, str],
+    output_dir,
+    window: int = 100,
+    title_prefix: str = "HW3-3 Random Mode",
+    smoke_test: bool = False,
+) -> dict:
+    """
+    HW3-3 E1/E2/E3 比較全套圖（dict 介面）。
+
+    Args:
+        csv_map:     {label: csv_path} 字典
+        output_dir:  輸出目錄
+        window:      移動平均視窗
+        title_prefix: 圖表標題前綴
+
+    Returns:
+        dict 包含各圖表路徑
+    """
+    output_dir = Path(output_dir)
+    labels     = list(csv_map.keys())
+    csv_paths  = [csv_map[k] for k in labels]
+    paths      = {}
+
+    paths["reward"] = plot_reward_comparison(
+        csv_paths, output_dir / "hw3_3_random_reward_comparison_e1_e2_e3.png",
+        window=window, title=f"{title_prefix} — Reward (E1/E2/E3)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["win_rate"] = plot_win_rate_comparison(
+        csv_paths, output_dir / "hw3_3_random_win_rate_comparison_e1_e2_e3.png",
+        window=window, title=f"{title_prefix} — Win Rate (E1/E2/E3)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["loss"] = plot_loss_comparison(
+        csv_paths, output_dir / "hw3_3_random_loss_comparison_e1_e2_e3.png",
+        window=window, title=f"{title_prefix} — Loss (E1/E2/E3)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["steps"] = plot_steps_comparison(
+        csv_paths, output_dir / "hw3_3_random_steps_comparison_e1_e2_e3.png",
+        window=window, title=f"{title_prefix} — Steps (E1/E2/E3)",
+        labels=labels, smoke_test=smoke_test)
+
+    paths["final_bar"] = plot_final_performance_bar(
+        csv_paths, output_dir / "hw3_3_random_final_metrics_e1_e2_e3.png",
+        metric="final_win_rate", window=window,
+        title=f"{title_prefix} — Final Win Rate (last {window} ep)",
+        labels=labels, smoke_test=smoke_test)
+
+    # 額外：epsilon decay 比較（從 CSV epsilon 欄）
+    try:
+        _apply_style()
+        fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+        for i, (label, csv_path) in enumerate(csv_map.items()):
+            df = load_experiment_log(csv_path)
+            color = DEFAULT_COLORS[i % len(DEFAULT_COLORS)]
+            ax.plot(df["episode"], df["epsilon"], color=color, linewidth=1.8, label=label)
+        ax.set_title(f"{title_prefix} — Epsilon Decay Comparison", fontsize=14, pad=12)
+        ax.set_xlabel("Episode", fontsize=11)
+        ax.set_ylabel("Epsilon", fontsize=11)
+        ax.legend(fontsize=10)
+        ax.grid(True)
+        fig.tight_layout()
+        paths["epsilon"] = _save_figure(fig, output_dir / "hw3_3_random_epsilon_decay_comparison.png", smoke_test=smoke_test)
+    except Exception as e:
+        print(f"  [WARN] Epsilon comparison skipped: {e}")
+
+    # 額外：learning rate 曲線（從 CSV learning_rate 欄）
+    try:
+        _apply_style()
+        fig, ax = plt.subplots(figsize=FIGURE_SIZE)
+        for i, (label, csv_path) in enumerate(csv_map.items()):
+            df = load_experiment_log(csv_path)
+            if "learning_rate" in df.columns and df["learning_rate"].max() > 0:
+                color = DEFAULT_COLORS[i % len(DEFAULT_COLORS)]
+                ax.plot(df["episode"], df["learning_rate"], color=color, linewidth=1.8, label=label)
+        ax.set_title(f"{title_prefix} — Learning Rate Curve", fontsize=14, pad=12)
+        ax.set_xlabel("Episode", fontsize=11)
+        ax.set_ylabel("Learning Rate", fontsize=11)
+        ax.legend(fontsize=10)
+        ax.grid(True)
+        fig.tight_layout()
+        paths["lr"] = _save_figure(fig, output_dir / "hw3_3_random_learning_rate_curve.png", smoke_test=smoke_test)
+    except Exception as e:
+        print(f"  [WARN] LR curve skipped: {e}")
+
+    print(f"[Comparison] Generated {len(paths)} HW3-3 figures → {output_dir}/hw3_3_random_*.png")
+    return paths

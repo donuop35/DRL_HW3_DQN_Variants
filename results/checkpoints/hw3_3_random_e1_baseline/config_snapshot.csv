@@ -1,0 +1,2 @@
+experiment_id,hw_part,mode,algorithm,seed,episodes,max_steps_per_episode,gamma,learning_rate,batch_size,replay_capacity,target_update_frequency,use_gradient_clipping,max_grad_norm,use_lr_scheduler,use_lightning,epsilon_start,epsilon_end,epsilon_decay_type,use_target_network,use_double_dqn,use_dueling_dqn,use_per,use_n_step,n_step,use_noisy_net,use_distributional
+hw3_3_random_e1_baseline,hw3_3,random,RandomDQN_Baseline,42,5000,50,0.9,0.001,200,1000,500,False,1.0,False,True,1.0,0.1,linear,True,False,False,False,False,3,False,False

@@ -43,16 +43,17 @@
 
 | # | 教授需求 | 對應程式 | 對應 Config | 對應實驗 | 對應圖表 | 報告章節 | 驗收狀態 |
 |---|---------|---------|------------|---------|---------|---------|---------|
-| 3.1 | 轉換至 PyTorch Lightning | `src/agents/lightning_dqn.py` + `src/training/lightning_trainer.py` | `configs/hw3_3_random/e2_stabilized.yaml` | E2, E3 | — | Ch4 | ⬜ 待實作 |
-| 3.2 | Random Mode 訓練 | `scripts/run_hw3_3_random.py` | e1, e2, e3 configs | E1, E2, E3 | — | — | ⬜ 待實作 |
-| 3.3 | Gradient Clipping | `src/training/lightning_trainer.py` | e2_stabilized.yaml | E2, E3 | hw3_3_e2_vs_e1.png | Ch4.2 | ⬜ 待實作 |
-| 3.4 | LR Scheduling | `src/training/lightning_trainer.py` | e2_stabilized.yaml | E2, E3 | hw3_3_e2_vs_e1.png | Ch4.2 | ⬜ 待實作 |
-| 3.5 | Training Tips 整合（隱性） | 上述 | 上述 | E1→E2 對比 | **hw3_3_ablation.png** | Ch4 消融 | ⬜ 待實作 |
-| 3.6 | PER 實作（加分） | `src/buffers/per_buffer.py` | e3_per.yaml | E3 | hw3_3_e3_vs_e2.png | Ch4.3 | ⬜ 待實作 |
-| 3.7 | Epsilon Decay Tuning（加分） | `src/utils/epsilon_scheduler.py` | e3_per.yaml | E3 | hw3_3_epsilon_comparison.png | Ch4.3 | ⬜ 待實作 |
-| 3.8 | Reward/Loss 視覺化（隱性） | `src/plotting/plot_utils.py` | — | E1, E2, E3 | 各曲線圖 | Ch4 | ⬜ 待實作 |
+| 3.1 | 轉換至 PyTorch Lightning | `src/training/lightning_dqn_module.py`（LightningDQNModule : pl.LightningModule） | e1/e2/e3 yaml（use_lightning=true） | E1, E2, E3 全部 | — | 理解報告 §19、主報告 4.2 | ✅ 完成 |
+| 3.2 | Random Mode 訓練（E1/E2/E3） | `scripts/run_hw3_3_random.py` | `configs/hw3_3_random/e{1,2,3}_*.yaml` | E1/E2/E3 | — | — | ✅ 完成 |
+| 3.3 | Gradient Clipping | `lightning_dqn_module.py:training_step()`（clip_grad_norm_）| e2/e3（use_gradient_clipping=true, max_norm=1.0）| E2, E3 | hw3_3_random_loss_comparison_e1_e2_e3.png | 理解報告 §20、主報告 4.1 | ✅ 完成 |
+| 3.4 | LR Scheduling | `lightning_dqn_module.py:configure_optimizers()`（StepLR） | e2/e3（use_lr_scheduler=true）| E2, E3 | hw3_3_random_learning_rate_curve.png | 理解報告 §21、主報告 4.2 | ✅ 完成 |
+| 3.5 | Training Tips 整合 + 消融比較 | 上述 | e1 vs e2 vs e3 | E1→E2→E3 消融 | **hw3_3_random_{reward,win_rate,loss,steps}_comparison_e1_e2_e3.png（4張）** | 主報告 4.3–4.5 | ✅ 完成 |
+| 3.6 | PER 實作 | `src/buffers/prioritized_replay_buffer.py`（SumTree + IS weights） | e3（use_per=true, alpha=0.6）| E3 | hw3_3_random_final_metrics_e1_e2_e3.png | 理解報告 §23、主報告 4.5 | ✅ 完成 |
+| 3.7 | Epsilon Decay Tuning | `lightning_dqn_module.py:decay_epsilon()`（linear/exponential） | e1(linear)→e2/e3(exp) | E1/E2/E3 | **hw3_3_random_epsilon_decay_comparison.png** | 理解報告 §22 | ✅ 完成 |
+| 3.8 | Reward/Loss/Win-Rate 視覺化 | `src/plotting/plot_comparison.py:plot_hw3_3_comparison()` | — | E1, E2, E3 | 7 張比較圖 | 主報告 4.4 | ✅ 完成（7 張） |
 
-**HW3-3 小計：8 項需求 → 8 個對應**
+**HW3-3 小計：8/8 項需求完成 ✅ | E3 PER+Stabilized 全體 Win Rate 最高（85.2%）**
+
 
 ---
 

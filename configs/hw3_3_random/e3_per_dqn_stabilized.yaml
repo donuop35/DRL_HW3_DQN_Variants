@@ -1,0 +1,54 @@
+# configs/hw3_3_random/e3_per_dqn_stabilized.yaml
+# HW3-3 E3：PER-DQN + Stabilization（正式 HW3-3 主方法）
+# ━━ E2 的全部技術 + Prioritized Experience Replay ━━
+
+experiment_id: hw3_3_random_e3_per_stabilized
+hw_part: hw3_3
+mode: random
+algorithm: PER_DQN_Stabilized
+seed: 42
+
+network:
+  input_dim: 64
+  hidden_1: 150
+  hidden_2: 100
+  output_dim: 4
+
+training:
+  episodes: 5000
+  max_steps_per_episode: 50
+  gamma: 0.9
+  learning_rate: 0.001
+  batch_size: 200
+  replay_capacity: 1000
+  target_update_frequency: 500
+  use_gradient_clipping: true     # E3：開啟 gradient clipping（繼承 E2）
+  max_grad_norm: 1.0
+  use_lr_scheduler: true          # E3：開啟 LR scheduling（繼承 E2）
+  lr_scheduler_type: StepLR
+  lr_scheduler_step_size: 1000
+  lr_scheduler_gamma: 0.9
+  use_lightning: true
+
+epsilon:
+  epsilon_start: 1.0
+  epsilon_end: 0.05               # E3：同 E2
+  epsilon_decay_type: exponential # E3：指數衰減（繼承 E2）
+  epsilon_decay_steps: 3000
+
+algorithm_flags:
+  use_target_network: true
+  use_double_dqn: false
+  use_dueling_dqn: false
+  use_per: true                   # E3：開啟 PER ← 核心改進
+  per_alpha: 0.6                  # priority 指數
+  per_beta_start: 0.4             # IS weight 起始值
+  per_beta_end: 1.0               # IS weight 目標值（全訓練 anneal 到 1）
+  per_epsilon: 1.0e-5             # 防止 priority = 0
+  use_n_step: false
+  n_step: 3
+  use_noisy_net: false
+  use_distributional: false
+  c51_atoms: 51
+  c51_v_min: -10.0
+  c51_v_max: 10.0
